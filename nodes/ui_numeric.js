@@ -21,6 +21,7 @@ module.exports = function(RED) {
             control: {
                 type: 'numeric',
                 label: config.label,
+                tooltip: config.tooltip,
                 order: config.order,
                 format: config.format,
                 pre: config.format.split('{{')[0] || "",
@@ -29,6 +30,7 @@ module.exports = function(RED) {
                 min: Number(config.min),
                 max: Number(config.max),
                 step: Number(config.step || 1),
+                wrap: config.wrap || false,
                 width: config.width || group.config.width || 6,
                 height: config.height || 1,
                 ed: (config.format.includes("value") ? false : true)

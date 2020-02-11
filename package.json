@@ -1,6 +1,6 @@
 {
     "name": "node-red-dashboard",
-    "version": "2.9.9-beta",
+    "version": "2.19.4",
     "description": "A set of dashboard nodes for Node-RED",
     "keywords": [
         "node-red"
@@ -34,6 +34,12 @@
         },
         {
             "name": "Hiroyasu Nishiyama"
+        },
+        {
+            "name": "Steve Rickus"
+        },
+        {
+            "name": "Kazuhiro Ito"
         }
     ],
     "license": "Apache-2.0",
@@ -63,57 +69,66 @@
             "ui_template": "nodes/ui_template.js",
             "ui_link": "nodes/ui_link.js",
             "ui_tab": "nodes/ui_tab.js",
-            "ui_group": "nodes/ui_group.js"
+            "ui_group": "nodes/ui_group.js",
+            "ui_spacer": "nodes/ui_spacer.js"
         }
     },
     "dependencies": {
-        "serve-static": "~1.13.2",
-        "socket.io": "^2.1.1"
+        "compression": "^1.7.4",
+        "serve-static": "^1.14.1",
+        "socket.io": "^2.3.0"
     },
     "devDependencies": {
-        "angular": "~1.5.11",
-        "angular-animate": "~1.5.11",
-        "angular-aria": "~1.5.11",
+        "angular": "~1.7.9",
+        "angular-animate": "~1.7.9",
+        "angular-aria": "~1.7.9",
         "angular-chart.js": "^1.1.1",
-        "angular-material": "~1.1.10",
+        "angular-material": "~1.1.20",
         "angular-material-icons": "^0.7.1",
-        "angular-messages": "~1.5.11",
-        "angular-mocks": "~1.5.11",
-        "angular-route": "~1.5.11",
-        "angular-sanitize": "~1.5.11",
-        "angular-touch": "~1.5.11",
+        "angular-messages": "~1.7.9",
+        "angular-mocks": "~1.7.9",
+        "angular-route": "~1.7.9",
+        "angular-sanitize": "~1.7.9",
+        "angular-touch": "~1.7.9",
         "angularjs-color-picker": "^3.4.8",
         "chart.js": "~2.3.0",
         "d3": "^3.5.17",
         "font-awesome": "^4.7.0",
-        "gulp": "~3.9.1",
-        "gulp-angular-templatecache": "^2.2.1",
-        "gulp-clean-css": "^3.10.0",
+        "gridstack": "^0.4.0",
+        "gulp": "~4.0.2",
+        "gulp-angular-templatecache": "~3.0.0",
+        "gulp-clean-css": "^4.0.0",
         "gulp-concat": "^2.6.1",
+        "gulp-concat-css": "^3.1.0",
+        "gulp-debug": "^4.0.0",
         "gulp-eol": "^0.2.0",
-        "gulp-header": "^2.0.5",
+        "gulp-header": "^2.0.9",
         "gulp-html-replace": "^1.6.2",
         "gulp-html-src": "^1.0.0",
-        "gulp-htmlmin": "^4.0.0",
-        "gulp-if": "^2.0.2",
-        "gulp-insert-lines": "0.0.4",
+        "gulp-htmlmin": "^5.0.1",
+        "gulp-if": "^3.0.0",
         "gulp-jscs": "^4.1.0",
         "gulp-jshint": "^2.1.0",
-        "gulp-manifest": "^0.1.1",
-        "gulp-remove-html": "^1.3.0",
-        "gulp-replace": "^0.6.1",
-        "gulp-resources": "^0.5.0",
-        "gulp-uglify": "~3.0.1",
+        "gulp-manifest3": "^0.1.2",
+        "gulp-rename": "^1.4.0",
+        "gulp-replace": "^1.0.0",
+        "gulp-sass": "^4.0.2",
+        "gulp-uglify": "~3.0.2",
         "gulp-util": "^3.0.8",
-        "jquery": "^3.3.1",
-        "jshint": "^2.9.6",
-        "justgage": "^1.2.2",
-        "less": "~3.8.1",
-        "moment": "~2.22.2",
-        "sprintf-js": "^1.0.3",
+        "jquery": "^3.4.1",
+        "jshint": "^2.10.3",
+        "justgage": "~1.3.3",
+        "less": "~3.9.0",
+        "lodash": "^4.17.15",
+        "material-design-icons-iconfont": "^5.0.1",
+        "moment": "~2.24.0",
+        "sprintf-js": "^1.1.2",
         "streamqueue": "~1.1.2",
         "svg-morpheus": "^0.3.0",
         "tinycolor2": "^1.4.1",
-        "weather-icons-lite": "^1.0.0"
+        "weather-icons-lite": "^1.1.0"
+    },
+    "engines": {
+        "node": ">=8"
     }
 }

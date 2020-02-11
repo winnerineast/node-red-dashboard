@@ -17,7 +17,8 @@ module.exports = function(RED) {
         updateUi: updateUi,
         ev: ev,
         getTheme: getTheme,
-        getSizes: getSizes
+        getSizes: getSizes,
+        isDark: isDark
     };
 };
 
@@ -26,6 +27,7 @@ var path = require('path');
 var events = require('events');
 var socketio = require('socket.io');
 var serveStatic = require('serve-static');
+var compression = require('compression')
 var dashboardVersion = require('./package.json').version;
 
 var baseConfiguration = {};
@@ -39,6 +41,7 @@ var replayMessages = {};
 var removeStateTimers = {};
 var removeStateTimeout = 1000;
 var ev = new events.EventEmitter();
+var params = {};
 ev.setMaxListeners(0);
 
 // default manifest.json to be returned as required.
@@ -57,13 +60,13 @@ var mani = {
     ]
 }
 
-function toNumber(keepDecimals, config, input) {
+function toNumber(keepDecimals, config, input, old, m, s) {
     if (input === undefined) { return; }
     if (typeof input !== "number") {
         var inputString = input.toString();
         input = keepDecimals ? parseFloat(inputString) : parseInt(inputString);
     }
-    if (config.step) { input = Math.round(Math.round(input/config.step)*config.step*10000)/10000; }
+    if (s) { input = Math.round(Math.round(input/s)*s*10000)/10000; }
     return isNaN(input) ? config.min : input;
 }
 
@@ -72,8 +75,11 @@ function emit(event, data) {
 }
 
 function emitSocket(event, data) {
-    if (data.hasOwnProperty("socketid") && (data.socketid !== undefined)) {
-        io.to(data.socketid).emit(event,data);
+    if (data.hasOwnProperty("msg") && data.msg.hasOwnProperty("socketid") && (data.msg.socketid !== undefined)) {
+        io.to(data.msg.socketid).emit(event, data);
+    }
+    else if (data.hasOwnProperty("socketid") && (data.socketid !== undefined)) {
+        io.to(data.socketid).emit(event, data);
     }
     else {
         io.emit(event, data);
@@ -105,6 +111,8 @@ options:
         If true, forwards input messages to the output
     [storeFrontEndInputAsState] - boolean (default true).
         If true, any message received from front-end is stored as state
+    [persistantFrontEndValue] - boolean (default true).
+        If true, last received message is send again when front end reconnect.
 
     [convert] - callback to convert the value before sending it to the front-end
     [beforeEmit] - callback to prepare the message that is emitted to the front-end
@@ -125,6 +133,9 @@ function add(opt) {
     if (typeof opt.storeFrontEndInputAsState === 'undefined') {
         opt.storeFrontEndInputAsState = true;
     }
+    if (typeof opt.persistantFrontEndValue === 'undefined') {
+        opt.persistantFrontEndValue = true;
+    }
     opt.convert = opt.convert || noConvert;
     opt.beforeEmit = opt.beforeEmit || beforeEmit;
     opt.convertBack = opt.convertBack || noConvert;
@@ -137,7 +148,7 @@ function add(opt) {
             var state = replayMessages[opt.node.id];
             if (!state) { replayMessages[opt.node.id] = state = {id: opt.node.id}; }
             state.disabled = !msg.enabled;
-            io.emit(updateValueEventName, state);
+            io.emit(updateValueEventName, state); // dcj mu
         }
 
         // remove res and req as they are often circular
@@ -166,7 +177,7 @@ function add(opt) {
 
         // Call the convert function in the node to get the new value
         // as well as the full dataset.
-        var conversion = opt.convert(msg.payload, oldValue, msg);
+        var conversion = opt.convert(msg.payload, oldValue, msg, opt.control.step);
 
         // If the update flag is set, emit the newPoint, and store the full dataset
         var fullDataset;
@@ -199,7 +210,7 @@ function add(opt) {
             else { toEmit = toStore; }
 
             var addField = function(m) {
-                if (opt.control.hasOwnProperty(m) && opt.control[m].indexOf("{{") !== -1) {
+                if (opt.control.hasOwnProperty(m) && opt.control[m] && opt.control[m].indexOf("{{") !== -1) {
                     var a = opt.control[m].split("{{");
                     a.shift();
                     for (var i = 0; i < a.length; i++) {
@@ -214,15 +225,17 @@ function add(opt) {
                             if (b.indexOf(".") !== -1) { b = b.split(".")[0]; }
                             if (b.indexOf("[") !== -1) { b = b.split("[")[0]; }
                             if (!toEmit.hasOwnProperty("msg")) { toEmit.msg = {}; }
-                            if (!toEmit.msg.hasOwnProperty(b) && msg.hasOwnProperty(b)) {
-                                toEmit.msg[b] = JSON.parse(JSON.stringify(msg[b]));
+                            if (!toEmit.msg.hasOwnProperty(b) && msg.hasOwnProperty(b) && (msg[b] !== undefined)) {
+                                if (Buffer.isBuffer(msg[b])) { toEmit.msg[b] = msg[b].toString("binary"); }
+                                else { toEmit.msg[b] = JSON.parse(JSON.stringify(msg[b])); }
                             }
                         }
                         else {
                             if (b.indexOf(".") !== -1) { b = b.split(".")[0]; }
                             if (b.indexOf("[") !== -1) { b = b.split("[")[0]; }
                             if (!toEmit.hasOwnProperty(b) && msg.hasOwnProperty(b)) {
-                                toEmit[b] = JSON.parse(JSON.stringify(msg[b]));
+                                if (Buffer.isBuffer(msg[b])) { toEmit[b] = msg[b].toString("binary"); }
+                                else { toEmit[b] = JSON.parse(JSON.stringify(msg[b])); }
                             }
                         }
                     }
@@ -236,11 +249,13 @@ function add(opt) {
             addField("units");
             if (msg.hasOwnProperty("enabled")) { toEmit.disabled = !msg.enabled; }
             toEmit.id = toStore.id = opt.node.id;
-
+            //toEmit.socketid = msg.socketid; // dcj mu
             // Emit and Store the data
             //if (settings.verbose) { console.log("UI-EMIT",JSON.stringify(toEmit)); }
-            io.emit(updateValueEventName, toEmit);
-            replayMessages[opt.node.id] = toStore;
+            emitSocket(updateValueEventName, toEmit);
+            if (opt.persistantFrontEndValue) {
+                replayMessages[opt.node.id] = toStore;
+            }
 
             // Handle the node output
             if (opt.forwardInputMessages && opt.node._wireCount) {
@@ -260,18 +275,21 @@ function add(opt) {
         } // don't accept input if we are in read only mode
         else {
             var converted = opt.convertBack(msg.value);
-            if (opt.storeFrontEndInputAsState) {
+            if (opt.storeFrontEndInputAsState === true) {
                 currentValues[msg.id] = converted;
-                replayMessages[msg.id] = msg;
+                if (opt.persistantFrontEndValue) {
+                    replayMessages[msg.id] = msg;
+                }
             }
             var toSend = {payload:converted};
             toSend = opt.beforeSend(toSend, msg) || toSend;
             toSend.socketid = toSend.socketid || msg.socketid;
+            if (toSend.hasOwnProperty("topic") && (toSend.topic === undefined)) { delete toSend.topic; }
             if (!msg.hasOwnProperty("_fromInput")) {   // TODO: too specific
                 opt.node.send(toSend);      // send to following nodes
             }
         }
-        if (opt.storeFrontEndInputAsState) {
+        if (opt.storeFrontEndInputAsState === true) {
             //fwd to all UI clients
             io.emit(updateValueEventName, msg);
         }
@@ -291,9 +309,11 @@ function add(opt) {
 
 //from: https://stackoverflow.com/a/28592528/3016654
 function join() {
-    var trimRegex = new RegExp('^\\/|\\/$','g'),
-    paths = Array.prototype.slice.call(arguments);
-    return '/'+paths.map(function(e) {return e.replace(trimRegex,"");}).filter(function(e) {return e;}).join('/');
+    var trimRegex = new RegExp('^\\/|\\/$','g');
+    var paths = Array.prototype.slice.call(arguments);
+    return '/'+paths.map(function(e) {
+        if (e) { return e.replace(trimRegex,""); }
+    }).filter(function(e) {return e;}).join('/');
 }
 
 function init(server, app, log, redSettings) {
@@ -314,22 +334,28 @@ function init(server, app, log, redSettings) {
 
     io = socketio(server, {path: socketIoPath});
 
+    var dashboardMiddleware = function(req, res, next) { next(); }
+
+    if (uiSettings.middleware) {
+        if (typeof uiSettings.middleware === "function") {
+            dashboardMiddleware = uiSettings.middleware;
+        }
+    }
+
     fs.stat(path.join(__dirname, 'dist/index.html'), function(err, stat) {
+        app.use(compression());
         if (!err) {
             app.use( join(settings.path, "manifest.json"), function(req, res) { res.send(mani); });
-            app.use( join(settings.path), serveStatic(path.join(__dirname, "dist")) );
+            app.use( join(settings.path), dashboardMiddleware, serveStatic(path.join(__dirname, "dist")) );
         }
         else {
             log.info("[Dashboard] Dashboard using development folder");
-            app.use(join(settings.path), serveStatic(path.join(__dirname, "src")));
+            app.use(join(settings.path), dashboardMiddleware, serveStatic(path.join(__dirname, "src")));
             var vendor_packages = [
                 'angular', 'angular-sanitize', 'angular-animate', 'angular-aria', 'angular-material', 'angular-touch',
                 'angular-material-icons', 'svg-morpheus', 'font-awesome', 'weather-icons-lite',
-                'sprintf-js',
-                'jquery', 'jquery-ui',
-                'd3', 'raphael', 'justgage',
-                'angular-chart.js', 'chart.js', 'moment',
-                'angularjs-color-picker', 'tinycolor2', 'less'
+                'sprintf-js', 'jquery', 'jquery-ui', 'd3', 'raphael', 'justgage', 'angular-chart.js', 'chart.js',
+                'moment', 'angularjs-color-picker', 'tinycolor2', 'less'
             ];
             vendor_packages.forEach(function (packageName) {
                 app.use(join(settings.path, 'vendor', packageName), serveStatic(path.join(__dirname, 'node_modules', packageName)));
@@ -357,7 +383,7 @@ function init(server, app, log, redSettings) {
             var name = "";
             if ((index != null) && !isNaN(index) && (menu.length > 0) && (index < menu.length) && menu[index]) {
                 name = (menu[index].hasOwnProperty("header") && typeof menu[index].header !== 'undefined') ? menu[index].header : menu[index].name;
-                ev.emit("changetab", index, name, socket.client.id, socket.request.connection.remoteAddress);
+                ev.emit("changetab", index, name, socket.client.id, socket.request.connection.remoteAddress, params);
             }
         });
         socket.on('ui-refresh', function() {
@@ -365,6 +391,13 @@ function init(server, app, log, redSettings) {
         });
         socket.on('disconnect', function() {
             ev.emit("endsocket", socket.client.id, socket.request.connection.remoteAddress);
+        });
+        socket.on('ui-audio', function(audioStatus) {
+            ev.emit("audiostatus", audioStatus, socket.client.id, socket.request.connection.remoteAddress);
+        });
+        socket.on('ui-params', function(p) {
+            delete p.socketid;
+            params = p;
         });
     });
 }
@@ -437,6 +470,9 @@ function addControl(tab, groupHeader, control) {
                 header: tab.config.name,
                 order: parseFloat(tab.config.order),
                 icon: tab.config.icon,
+                //icon: tab.config.hidden ? "fa-ban" : tab.config.icon,
+                disabled: tab.config.disabled,
+                hidden: tab.config.hidden,
                 items: []
             };
             menu.push(foundTab);
@@ -532,4 +568,14 @@ function getSizes() {
     else {
         return { sx:48, sy:48, gx:6, gy:6, cx:6, cy:6, px:0, py:0 };
     }
+}
+
+function isDark() {
+    if (baseConfiguration && baseConfiguration.hasOwnProperty("theme") && baseConfiguration.theme.hasOwnProperty("themeState")) {
+        var rgb = parseInt(baseConfiguration.theme.themeState["page-sidebar-backgroundColor"].value.substring(1), 16);
+        var luma = 0.2126 * ((rgb >> 16) & 0xff) + 0.7152 * ((rgb >> 8) & 0xff) + 0.0722 * ((rgb >> 0) & 0xff); // per ITU-R BT.709
+        if (luma > 128) { return false; }
+        else { return true; }
+    }
+    else { return false; } // if in doubt - let's say it's light.
 }

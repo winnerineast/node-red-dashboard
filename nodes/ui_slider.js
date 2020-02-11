@@ -21,11 +21,14 @@ module.exports = function(RED) {
             control: {
                 type: 'slider',
                 label: config.label,
+                tooltip: config.tooltip,
                 order: config.order,
                 value: config.min,
-                min: config.min,
-                max: config.max,
-                step: config.step || 1,
+                min: Math.min(config.min, config.max),
+                max: Math.max(config.max, config.min),
+                invert: (parseFloat(config.min) > parseFloat(config.max)) ? true : undefined,
+                step: Math.abs(config.step) || 1,
+                outs: config.outs || "all",
                 width: config.width || group.config.width || 6,
                 height: config.height || 1
             },

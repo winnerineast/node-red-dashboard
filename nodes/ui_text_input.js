@@ -18,6 +18,7 @@ module.exports = function(RED) {
             control: {
                 type: (config.delay <= 0 ? 'text-input-CR' : 'text-input'),
                 label: config.label,
+                tooltip: config.tooltip,
                 mode: config.mode,
                 delay: config.delay,
                 order: config.order,
@@ -26,7 +27,13 @@ module.exports = function(RED) {
                 height: config.height || 1
             },
             beforeSend: function (msg) {
-                if (config.mode === "time") { msg.payload = Date.parse(msg.payload); }
+                if (config.mode === "time") {
+                    if (typeof msg.payload === "string") {
+                        msg.payload = Date.parse(msg.payload);
+                    }
+                }
+                // if (config.mode === "week") { msg.payload = Date.parse(msg.payload); }
+                // if (config.mode === "month") { msg.payload = Date.parse(msg.payload); }
                 msg.topic = config.topic || msg.topic;
             }
         });

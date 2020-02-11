@@ -1,5 +1,6 @@
-angular.module('ui').service('UiEvents', ['$timeout',
-    function ($timeout) {
+/* global angular io */
+angular.module('ui').service('UiEvents',
+    function () {
         var updateValueEventName = 'update-value';
         var that = this;
 
@@ -22,7 +23,7 @@ angular.module('ui').service('UiEvents', ['$timeout',
                 }
 
                 var socketHandler = function(data) {
-                    $timeout(function() { handler(data); }, 0);
+                    handler(data);
                 };
 
                 socket.on(event, socketHandler);
@@ -31,17 +32,17 @@ angular.module('ui').service('UiEvents', ['$timeout',
             };
 
             socket.on('ui-controls', function (data) {
-                $timeout( onuiloaded(data, function() {
+                onuiloaded(data, function() {
                     socket.emit('ui-replay-state');
-                }), 0);
+                });
             });
 
             socket.on('ui-replay-done', function() {
-                $timeout(replaydone, 0);
+                replaydone();
             });
 
             socket.on('connect', function() {
                 that.id = socket.id;
             })
         };
-    }]);
+    });

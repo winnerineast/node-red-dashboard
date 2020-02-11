@@ -1,18 +1,20 @@
 <script type="text/javascript">
     // convert to i18 text
-    function c_(x) {
+    function c_ui_group(x) {
         return RED._("node-red-dashboard/ui_group:ui_group."+x);
     }
 
     RED.nodes.registerType('ui_group',{
         category: 'config',
         defaults: {
-            name: {value: c_("label.default")},
+            name: {value: c_ui_group("label.default")},
             tab: {type:"ui_tab", required: true },
             order: {value: 0},
             disp: {value: true},
             width: {value: 6},
-            collapse: {value: false}
+            collapse: {value: false},
+            disabled: {value: false},
+            hidden: {value: false}
         },
         sort: function(A,B) {
             if (A.tab !== B.tab) {
@@ -34,16 +36,17 @@
         label: function() {
             var tabNode = RED.nodes.node(this.tab);
             if (tabNode) {
-                return (this.name||c_("label.group"))+ " ["+(tabNode.name||c_("label.tab"))+"]"
+                return "["+(tabNode.name||c_ui_group("label.tab"))+"] " + (this.name || c_ui_group("label.group"));
             }
-            return (this.name || c_("label.group"))+" ["+c_("label.unassigned")+"]";
+            return "["+c_ui_group("label.unassigned")+"] " + (this.name || c_ui_group("label.group"));
         },
+        labelStyle: function() { return this.name?"node_label_italic":""; },
         oneditprepare: function() {
             $("#node-input-size").elementSizer({
                 width: "#node-config-input-width",
                 auto: false
             });
-            $("#node-config-input-disp").change(function() {
+            $("#node-config-input-disp").on("change", function() {
                 if ($("#node-config-input-disp").is(":checked")) {
                     $("#group-collapse-flag").show();
                 }
@@ -56,7 +59,7 @@
     });
 </script>
 
-<script type="text/x-red" data-template-name="ui_group">
+<script type="text/html" data-template-name="ui_group">
     <div class="form-row">
         <label for="node-config-input-name"><i class="fa fa-tag"></i> <span data-i18n="ui_group.label.name"></span></label>
         <input type="text" id="node-config-input-name">
@@ -78,6 +81,6 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="ui_group">
+<script type="text/html" data-help-name="ui_group">
     <p>Group</p>
 </script>

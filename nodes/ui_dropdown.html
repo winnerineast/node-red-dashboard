@@ -5,6 +5,7 @@
         defaults: {
             name: {value: ''},
             label: {value: ''},
+            tooltip: {value: ''},
             place: {value: 'Select option'},
             group: {type: 'ui_group', required:true},
             order: {value: 0},
@@ -19,7 +20,7 @@
             },
             height: {value: 0},
             passthru: {value: true},
-            options: {value:[{value: '', label : ''}], validate:function(value) { return value.length > 0; }},
+            options: {value:[{value: '', label : ''}]},
             payload: {value: ''},
             topic: {value: ''}
         },
@@ -28,6 +29,7 @@
         icon: "ui_dropdown.png",
         paletteLabel: 'dropdown',
         label: function() { return this.name || (~this.label.indexOf("{{") ? null : this.label) || 'dropdown'; },
+        labelStyle: function() { return this.name?"node_label_italic":""; },
         oneditprepare: function() {
             $("#node-input-size").elementSizer({
                 width: "#node-input-width",
@@ -101,7 +103,7 @@
     });
 </script>
 
-<script type="text/x-red" data-template-name="ui_dropdown">
+<script type="text/html" data-template-name="ui_dropdown">
     <div class="form-row">
         <label for="node-input-group"><i class="fa fa-table"></i> Group</label>
         <input type="text" id="node-input-group">
@@ -115,6 +117,10 @@
     <div class="form-row">
         <label for="node-input-label"><i class="fa fa-tag"></i> Label</label>
         <input type="text" id="node-input-label" placeholder="optional label">
+    </div>
+    <div class="form-row">
+        <label for="node-input-tooltip"><i class="fa fa-info-circle"></i> Tooltip</label>
+        <input type="text" id="node-input-tooltip" placeholder="optional tooltip">
     </div>
     <div class="form-row">
         <label for="node-input-place"><i class="fa fa-tag"></i> Placeholder</label>
@@ -143,7 +149,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="ui_dropdown">
+<script type="text/html" data-help-name="ui_dropdown">
     <p>Adds a dropdown select box to the user interface.</p>
     <p>Multiple value / label pairs can be added as required. If the label is not specified the
     value will be used for both.</p>

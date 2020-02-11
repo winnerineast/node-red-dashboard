@@ -1,10 +1,316 @@
+### 2.19.4: Maintenance Release
 
-### 2.9.9-beta: Maintenance Release
+**Enhancements**
+
+ - Add feedback option to dialog widget.
+ - Add persistantFrontEndValue property to addWidget options so it possbile to avoid replay message to be sent when front end reconnect. PR #558
+
+ **Fixes**
+
+ - Re-add gridstack min map to reduces warnings
+ - Added crossorigin attribute to manifest link. PR #560
+
+### 2.19.3: Maintenance Release
+
+**Enhancements**
+
+ - Let dropdown status show selected label rather than value.
+
+**Fixes**
+
+ - Fix notification to send cancel instead of OK when dismissed by blank message.
+ - Fix Angular theme reverting to light in menu. Issue #554
+
+### 2.19.2: Maintenance Release
+
+**Fixes**
+
+ - Revert dropping of angular material icons with animation. Issue #552
+ 
+ ### 2.19.1: Maintenance Release
+
+**Enhancements**
+
+ - Self host Material Icons Font - PR #550
+
+**Fixes**
+
+ - Adjust Gauge title spacing.
+
+### 2.19.0: Milestone Release
+
+**Enhancements**
+
+ - Let ui_form node accept input to prefill, and add multiline text
+ - Let dialog be removed by blank message.
+
+**Fixes**
+
+ - Fix undocumented change to justgage custom sectors api. Issue #547
+
+### 2.18.0: Milestone Release
+
+**Enhancements**
+ 
+ - Update justgauge to latest (now maintained) version and drop monkeypatch. Issue #535.
+ - Add engines node8 to package.json
+
+**Fixes**
+
+ - Stop propagation of swipe when using color picker - Issue #539
+ - Handle tab names with multiple spaces in for hide/show - Issue #541
+ - Update gulpfile.js to gulp 4 - Issue #542
+ - Fix numeric step rounding when changed by ui_control
+
+### 2.17.1: Maintenance Release
+
+**Fixes**
+
+ - Add warning re missing order property in custom widget nodes
+ - Fix notifications. Issue #537.
+
+### 2.17.0: Milestone Release
+
+ **Fixes**
+
+  - Better vertical align larger button icons if supplied via label text
+  - Fix ui_notification node to not accept raw HTML by default, add option to allow.
+
+### 2.16.3: Maintenance Release
+
+ **Enhancements**
+
+  - If template has height -1 then set it to 0 height (test).
+  - Add wrap value feature to numeric node.
+
+  **Fixes**
+
+  - Ensure widgets handle undefined msg parts for labels etc.
+  - Fix scrollbar theming inside template.
+  - Ensure msg.topic really doesn't exist if not specified, for all ui nodes. Was PR #531
+  - Backlevel less package to fix IE11 loading, Issue #530
+
+### 2.16.2: Maintenance Release
+
+**Enhancements**
+
+ - Ui-control can be set to only report connect events, or change tab events.
+
+**Fixes**
+
+ - Stop slider sending twice (after fixing endstop issue below). Issue #527
+ - Fix Theme colour swatch size.
+
+### 2.16.1: Maintenance Release
+
+**Fixes**
+
+ - Fix toast to show border correctly and better timing. Issue #525
+ - Stop colour picker sending on page refresh. Issue #514
+ - Fix layout tool group locations. PR #526
+ - Fix slider not sending if past end of widget.
+
+### 2.16.0: Milestone Release
+
+**Enhancements**
+
+ - Add Dashboard Layout tool - Major contribution - Thanks @KazuhiroItoh - PR #482
+ - Add ui.isDark() returns true/false if overall theme is dark or light, so the widget could switch appropriately. (can already use getTheme() to get actual colors if needs be.)
+
+ **Fixes**
+
+  - Make spacer transparent so background is really the background.
+  - Fix text_input to only send duplicates if enter key hit multiple times and not on loss of focus. Issue #513
+  - Fix color-picker to not emit on tab change, and fix background overlay. Issue #514
+  - Fix IE11 loading issue #515 (reversion)
+  - Improve embedded node-red dashboard full path resolve - Issue #517
+  - Let ui-form input be full width on IE11 - Issue #524
+
+### 2.15.5: Maintenance Release
+
+ **Enhancements**
+
+  - Add compression middleware by default to speed up loading. Thanks @zyrorl
+
+**Fixes**
+
+ - Fix legend to keep items hidden when new data arrives. Issue #507
+ - Re-re-fix switch to not show correct icon despite passthru, and toggle output correctly. Issue #506
+ - Make Dialog and Toast be more consistent
+ - Fix odd gauge behaviour when in donut mode
+ - Fix UI redraw (not redrawing when changing tabs). PR #508
+ - Fix vertical slider in only on release mode
+ - Let webfont loader be async to not delay page load when offline, and fail silently
+ - Fix Datepicker to honour Site date format
+ - Tweak passthrough option wording to try to match what actually happens
+ - Fix text-input to only send one message when using tab key to move fields
+
+### 2.15.4: Maintenance Release
+
+**Enhancements**
+
+ - Add CSS variable names for main theme colours to make user customisations easier
+
+**Fixes**
+
+ - Re-fix switch to not visibly switch when set to show input not output. Issue #506
+ - Fix colour swatch widths in ui_chart and ui_gauge.
+
+### 2.15.3: Maintenance Release
+
+**Enhancements**
+
+ - Let ui_template use full screen editor (when used with NR 1.0)
+
+**Fixes**
+
+ - Fix slider css so numbers stay visible when in "on release only" mode
+ - Fix switch to show correct state for late connecting clients. Issue #497
+ - Fix button to show correct state for late connecting clients. Issue #499
+ - Fix sidenav to ensure colour picker is behind it. Part of issue #492
+ - Better contrast for sidebar menu buttons to work across themes. Issue #500
+ - Revert colour picker to its default design with colour + lightness, add square option, and fix cursor. Issue #502
+ - Fix slider discrete mode to align better, blend theme better and not hide thumb. Issue #503
+ - Fix button to return to original colour on loss of focus. Issue #504
+
+### 2.15.2: Maintenance Release
+
+**Fixes**
+
+ - Fix legend being visible when it should not be. Issue #494
+ - Fix ui_text_input time mode to accept and passthrough input correctly. Issue #495
+ - Fix theme to better handle new ui_list node switch styles.
+
+### 2.15.1: Maintenance Release
+
+ **Fixes**
+
+  - Fix built in fa-icons font paths
+
+### 2.15.0: Milestone Release
+
+**Enhancements**
+
+ - Allow ui_chart to have many more options set by control message, see [config-fields.md](config-fields.md)
+ - Allow `ui.middleware` in settings.js to specify middleware for use with dashboard endpoint. See [PR #209](https://github.com/node-red/node-red-dashboard/pull/209/) for example usage.
+
+**Fixes**
+
+ - Ensure `msg.enabled` applies to all themes. Issue #481
+ - Ensure theme applies to popup dialog alerts also.
+ - Ensure slider only sends on mouse up when in that mode. Issue #490
+
+### 2.14.0: Milestone Release
+
+**Enhancements**
+
+ - Allow Tabs to be hidden or disabled dynamically from a ui_control msg.
+ - Finally remove deprecated second output from ui_chart node.
+ - Allow ui_form to be submitted with empty fields (if they are not required)
+
+**Fixes**
+
+ - Don't try to close non-existent menu at start (logging issue only) - Issue #470
+ - Add startsWith polyfill for IE11
+ - Ensure active sidebar menu item is highlighted - Issue #472
+ - Sanitise display of html input - Issue #473
+ - Respect msg.socketid to return msg back to selected session when using ui_template
+ - Allow dropdown to have 0 pre-configured values, by removing validation.
+
+### 2.13.2: Maintenance Release
+
+**Fixes**
+
+ - Revert change that broke gauge pointer colours
+
+### 2.13.1: Maintenance Release
+
+**Fixes**
+
+ - Fix ui_template to return correct sessionid to each browser.
+ - Fix line chart xAxis hover to use same time format as main axis
+ - Fix chart colours to have more than 9 colours just in case - Issue #465
+ - Remove circular ref in menu that caused problems with 0.20 beta
+ - Let ui_text node send data onBlur when in wait for key mode
+ - Update Angular dependency to 1.7.6 - Issue #462
+ - Add X-UA-Compatible tag to help to get IE-11 to behave
+ - Fix css to use numerics not incorrect name - Issue #469
+
+### 2.13.0: Milestone Release
+
+**Enhancements**
+
+ - Add ability to hide and/or disable tabs manually - PR #456
+
+**Fixes**
+
+ - Fix up ui_text toString mishandling error - Issue #459
+ - Add some undo capability to ordering of widgets - Issue #461
+
+### 2.12.2: Maintenance Release
+
+**Fixes**
+
+ - Revert change to button and switch typed inputs - Issue #455
+ - Fix handling of {{msg.property}} handling for labels
+
+### 2.12.1: Maintenance Release
+
+**Fixes**
+
+ - Ensure spacer actually gets created with no users
+
+### 2.12.0: Milestone Release
+
+**Enhancements**
+
+ - Introduce concept of spacer nodes in groups to allow more widget layout options
+
+**Fixes**
+
+ - Set order value correctly for newly added ui nodes
+ - Let ui_text node handle buffers without mangling to utf8
+ - Fix ui_template info odd/even example to work again (after theme changes)
+ - Ensure colour picker retains old value on multiple reloads when in dynamic mode - Issue #452
+ - Fix missing page titles (mea culpa) - Issue #453
+
+### 2.11.0: Milestone Release
+
+**Enhancements**
+
+ - Let side menu be locked open via site config tab - Issue #446
+ - Let audio playback node show status in editor for debug
+
+**Fixes**
+
+ - Fix button background CSS so it can be over-ridden - Issue #444
+
+### 2.10.1: Maintenance Release
+
+**Enhancements**
+
+ - Let slider only send on mouse release (discrete mode)
+
+**Fixes**
+
+ - Stop background path css escape for gauge
+ - Fix radar chart so it picks up theme - Issue #443
+
+### 2.10.0: Milestone Release
+
+**Enhancements**
+
+ - Add PR to allow pluggable widgets. PR #427
+   - see https://github.com/node-red/node-red-dashboard/wiki/Creating-New-Dashboard-Widgets
+ - Let users use 100% Angular theme if desired.
+ - Add footer div with id nr-dashboard-footer to make targeting easier.
+ - Add Japanese translations for ui_control node. PR #439
 
 **Fixes**
 
  - Add polyfill for IE11 Object.assign. Issue #402
  - Tweak colour picker to default to solid colours
+ - Fix up ng-click colours in list. Issue #433
 
 ### 2.9.8: Maintenance Release
 

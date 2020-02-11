@@ -28,6 +28,7 @@ module.exports = function(RED) {
                 showHue: config.showHue,
                 showAlpha: config.showAlpha,
                 showLightness: config.showLightness,
+                square: (config.square == 'true') || false,
                 dynOutput: config.dynOutput,
                 allowEmpty: true,
                 order: config.order,
@@ -46,7 +47,7 @@ module.exports = function(RED) {
             },
             convert: function(p,o,m) {
                 if (m.payload === undefined) { return; }
-                colour = tc(m.payload);
+                var colour = tc(m.payload);
                 return colour.toString(config.format);
             }
         });

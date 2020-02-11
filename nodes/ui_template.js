@@ -41,7 +41,7 @@ module.exports = function(RED) {
                 templateScope: config.templateScope,
                 theme: colortheme
             },
-            beforeEmit: function(msg, value) {
+            beforeEmit: function(msg) {
                 var properties = Object.getOwnPropertyNames(msg).filter(function (p) { return p[0] != '_'; });
                 var clonedMsg = {
                     templateScope: config.templateScope
@@ -74,7 +74,11 @@ module.exports = function(RED) {
                 return { msg:clonedMsg };
             },
             beforeSend: function (msg, original) {
-                if (original) { return original.msg; }
+                if (original) {
+                    var om = original.msg;
+                    om.socketid = original.socketid;
+                    return om;
+                }
             }
         });
         node.on("close", done);
