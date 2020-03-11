@@ -163,7 +163,7 @@ function add(opt) {
             var changed = {};
             for (var property in msg.ui_control) {
                 if (msg.ui_control.hasOwnProperty(property) && opt.control.hasOwnProperty(property)) {
-                    if ((property !== "id")&&(property !== "type")&&(property !== "order")&&(property !== "name")&&(property !== "value")&&(property !== "label")&&(property !== "width")&&(property !== "height")) {
+                    if ((property !== "id")&&(property !== "type")&&(property !== "order")&&(property !== "name")&&(property !== "value")&&(property !== "width")&&(property !== "height")) {
                         opt.control[property] = msg.ui_control[property];
                         changed[property] = msg.ui_control[property];
                     }
@@ -182,7 +182,7 @@ function add(opt) {
         // If the update flag is set, emit the newPoint, and store the full dataset
         var fullDataset;
         var newPoint;
-        if ((typeof(conversion) === 'object') && (conversion.update !== undefined)) {
+        if ((typeof(conversion) === 'object') && (conversion !== null) && (conversion.update !== undefined)) {
             newPoint = conversion.newPoint;
             fullDataset = conversion.updatedValues;
         }

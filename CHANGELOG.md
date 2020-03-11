@@ -1,9 +1,23 @@
+### 2.19.5-beta: Maintenance Release
+
+**Enhancements**
+
+ - Add open and close options for groups to ui_control node.
+ - Add cubic and cubic-monotone to chart interpolation options.
+ - Allow ui_control msg to widgets also set .label property
+ - Add option to try to load dist/loading,html for those that want it
+
+ **Fixes**
+
+ - Add placeholder to ui-form date type to give a clue that yyyy-mm-dd works for Safari.
+ - Make Gridstack a normal dep so they can count installs. Bump to v0.5.5
+ 
 ### 2.19.4: Maintenance Release
 
 **Enhancements**
 
  - Add feedback option to dialog widget.
- - Add persistantFrontEndValue property to addWidget options so it possbile to avoid replay message to be sent when front end reconnect. PR #558
+ - Add persistantFrontEndValue property to addWidget options so it possible to avoid replay message to be sent when front end reconnect. PR #558
 
  **Fixes**
 
